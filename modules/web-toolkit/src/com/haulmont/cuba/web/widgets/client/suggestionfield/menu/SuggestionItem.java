@@ -21,7 +21,6 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Widget;
-import com.haulmont.cuba.web.widgets.client.suggestionfield.CubaSuggestionFieldWidget;
 
 public class SuggestionItem extends Widget implements HasText {
 
@@ -31,9 +30,9 @@ public class SuggestionItem extends Widget implements HasText {
     protected Scheduler.ScheduledCommand cmd;
     protected SuggestionsContainer suggestionsContainer;
 
-    protected CubaSuggestionFieldWidget.Suggestion suggestion;
+    protected SuggestionInfo suggestion;
 
-    public SuggestionItem(CubaSuggestionFieldWidget.Suggestion suggestion) {
+    public SuggestionItem(SuggestionInfo suggestion) {
         this.suggestion = suggestion;
 
         setElement(Document.get().createDivElement());
@@ -45,7 +44,7 @@ public class SuggestionItem extends Widget implements HasText {
         getElement().setAttribute("id", DOM.createUniqueId());
     }
 
-    public CubaSuggestionFieldWidget.Suggestion getSuggestion() {
+    public SuggestionInfo getSuggestion() {
         return suggestion;
     }
 
@@ -78,4 +77,41 @@ public class SuggestionItem extends Widget implements HasText {
             removeStyleName(SELECTED_ITEM_STYLENAME);
         }
     }
+
+    public interface SuggestionInfo {
+        String getId();
+
+        String getCaption();
+
+        String getStyleName();
+    }
+
+    public static class SuggestionInfoImpl implements SuggestionInfo {
+
+        private final String id;
+        private final String caption;
+        private final String styleName;
+
+        public SuggestionInfoImpl(String id, String caption, String styleName) {
+            this.id = id;
+            this.caption = caption;
+            this.styleName = styleName;
+        }
+
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        @Override
+        public String getCaption() {
+            return caption;
+        }
+
+        @Override
+        public String getStyleName() {
+            return styleName;
+        }
+    }
+
 }

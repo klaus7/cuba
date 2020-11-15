@@ -28,6 +28,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import com.haulmont.cuba.web.widgets.client.suggestionfield.menu.SuggestionItem;
+import com.haulmont.cuba.web.widgets.client.suggestionfield.menu.SuggestionItem.SuggestionInfo;
 import com.haulmont.cuba.web.widgets.client.suggestionfield.menu.SuggestionsContainer;
 import com.vaadin.client.BrowserInfo;
 import com.vaadin.client.ComputedStyle;
@@ -42,7 +43,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class CubaSuggestionFieldWidget extends Composite implements HasEnabled, Focusable, HasAllKeyHandlers,
-        HasValue<String>, HasSelectionHandlers<CubaSuggestionFieldWidget.Suggestion> {
+        HasValue<String>, HasSelectionHandlers<SuggestionInfo> {
     protected static final String V_FILTERSELECT_SUGGESTPOPUP = "v-filterselect-suggestpopup";
     protected static final String MODIFIED_STYLENAME = "modified";
 
@@ -63,7 +64,7 @@ public class CubaSuggestionFieldWidget extends Composite implements HasEnabled, 
     public Consumer<String> searchExecutor;
     public Consumer<String> arrowDownActionHandler;
     public Consumer<String> enterActionHandler;
-    public Consumer<Suggestion> suggestionSelectedHandler;
+    public Consumer<SuggestionInfo> suggestionSelectedHandler;
     public Runnable cancelSearchHandler;
 
     protected String value;
@@ -72,7 +73,7 @@ public class CubaSuggestionFieldWidget extends Composite implements HasEnabled, 
 
     public boolean iePreventBlur = false;
 
-    protected List<Suggestion> suggestions = new ArrayList<>();
+    protected List<SuggestionInfo> suggestions = new ArrayList<>();
     protected String popupStylename = "";
     protected String popupWidth;
 
@@ -125,7 +126,7 @@ public class CubaSuggestionFieldWidget extends Composite implements HasEnabled, 
 
         for (int i = 0; i < suggestions.length(); i++) {
             JsonObject jsonSuggestion = suggestions.getObject(i);
-            Suggestion suggestion = new Suggestion(
+            SuggestionInfo suggestion = new SuggestionItem.SuggestionInfoImpl(
                     jsonSuggestion.getString(SUGGESTION_ID),
                     jsonSuggestion.getString(SUGGESTION_CAPTION),
                     jsonSuggestion.getString(SUGGESTION_STYLE_NAME)
@@ -140,7 +141,7 @@ public class CubaSuggestionFieldWidget extends Composite implements HasEnabled, 
         Scheduler.get().scheduleDeferred(() -> {
             suggestionsContainer.clearItems();
 
-            for (Suggestion suggestion : suggestions) {
+            for (SuggestionInfo suggestion : suggestions) {
                 SuggestionItem menuItem = new SuggestionItem(suggestion);
                 menuItem.setScheduledCommand(this::selectSuggestion);
 
@@ -196,14 +197,14 @@ public class CubaSuggestionFieldWidget extends Composite implements HasEnabled, 
         }
     }
 
-    protected void selectSuggestion(Suggestion newSuggestion) {
+    protected void selectSuggestion(SuggestionInfo newSuggestion) {
         removeStyleName(MODIFIED_STYLENAME);
         suggestionsPopup.hide();
 
         prevQuery = null;
-        value = newSuggestion.caption;
+        value = newSuggestion.getCaption();
 
-        textField.setText(newSuggestion.caption);
+        textField.setText(newSuggestion.getCaption());
 
         suggestionSelectedHandler.accept(newSuggestion);
     }
@@ -398,7 +399,7 @@ public class CubaSuggestionFieldWidget extends Composite implements HasEnabled, 
     }
 
     @Override
-    public HandlerRegistration addSelectionHandler(SelectionHandler<Suggestion> handler) {
+    public HandlerRegistration addSelectionHandler(SelectionHandler<SuggestionInfo> handler) {
         return addHandler(handler, SelectionEvent.getType());
     }
 
@@ -602,31 +603,6 @@ public class CubaSuggestionFieldWidget extends Composite implements HasEnabled, 
 
         public void setQuery(String query) {
             this.query = query;
-        }
-    }
-
-    public class Suggestion {
-
-        private final String id;
-        private final String caption;
-        private final String styleName;
-
-        protected Suggestion(String id, String caption, String styleName) {
-            this.id = id;
-            this.caption = caption;
-            this.styleName = styleName;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getCaption() {
-            return caption;
-        }
-
-        public String getStyleName() {
-            return styleName;
         }
     }
 }
