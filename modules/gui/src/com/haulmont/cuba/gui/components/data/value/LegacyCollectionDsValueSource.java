@@ -294,8 +294,6 @@ public class LegacyCollectionDsValueSource<V extends Entity> implements ValueSou
                 masterCollection = new LinkedHashSet(newCollection);
             }
 
-            Collection<V> oldValue = getMaster().getItem().getValue(metaProperty.getName());
-
             getMaster().getItem().setValue(metaProperty.getName(), masterCollection);
         }
     }
