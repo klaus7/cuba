@@ -42,10 +42,13 @@ class SourceCodeEditorTest extends UiScreenSpec {
 
         where:
         start | end | cursor || text
-         1    |  3  | 5      || "A___DEFG"        //  1 = B     ;  3 = D     ; 5 = F
-        -1    | -1  | 5      || "ABCDE___FG"      // -1 = cursor; -1 = cursor; 5 = F
-         3    | -1  | 5      || "ABC___FG"        //  3 = D     ; -1 = cursor; 5 = F
-        -1    |  6  | 5      || "ABCDE___G"       // -1 = cursor;  6 = G     ; 5 = F
+         1    |  3  | 5      || "A___DEFG"        //  1 = B      ;  3 = D                        ; 5 = F
+        -1    | -1  | 5      || "ABCDE___FG"      // -1 = cursor ; -1 = cursor                   ; 5 = F
+         3    | -1  | 5      || "ABC___FG"        //  3 = D      ; -1 = cursor                   ; 5 = F
+        -1    |  6  | 5      || "ABCDE___G"       // -1 = cursor ;  6 = G                        ; 5 = F
+         0    |  6  | 5      || "___G"            // -1 = cursor ;  6 = G                        ; 5 = F
+         1    |  7  | 5      || "A___"            //  1 = A      ;  7 = text end                 ; 5 = F
+         1    |  8  | 5      || "A___"            //  1 = A      ;  8 = greater than text length ; 5 = F
     }
 
     protected Suggestion createSuggestion(int start, int end) {
