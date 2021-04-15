@@ -420,7 +420,20 @@ public abstract class StandardEditor<T extends Entity> extends Screen
         }
 
         Runnable standardCommitAction = () -> {
-            getScreenData().getDataContext().commit();
+            EntitySet committedEntities = getScreenData().getDataContext().commit();
+
+            InstanceContainer<T> container = getEditedEntityContainer();
+            if (container instanceof HasLoader) {
+                DataLoader loader = ((HasLoader) container).getLoader();
+                if (loader instanceof InstanceLoader) {
+                    @SuppressWarnings("rawtypes") InstanceLoader instanceLoader = (InstanceLoader) loader;
+                    if (instanceLoader.getEntityId() == null) {
+                        committedEntities.optional(getEditedEntity())
+                                .ifPresent(entity -> instanceLoader.setEntityId(entity.getId()));
+                    }
+                }
+            }
+
             fireEvent(AfterCommitChangesEvent.class, new AfterCommitChangesEvent(this));
         };
 
